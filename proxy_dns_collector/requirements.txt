@@ -1,0 +1,4 @@
+RouterOS_api==0.18.1
+scapy==2.6.1
+
+# linux packet: libpcap

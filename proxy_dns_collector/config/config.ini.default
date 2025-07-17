@@ -1,0 +1,18 @@
+[logger]
+#DEBUG
+level = INFO
+
+[bind9]
+address = 127.0.0.1
+port = 53
+
+[api]
+host = 172.16.100.1
+username = admin
+password = PASSWORD
+port = 8888
+address_list = dns_list
+comment = Add via API from Py script
+
+[filter]
+pattern = googlevideo, youtube, ggpht, ytimg

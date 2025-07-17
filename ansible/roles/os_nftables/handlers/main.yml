@@ -1,0 +1,9 @@
+- name: restarted_nftables_systemd
+  ansible.builtin.systemd:
+    name: nftables
+    state: restarted
+
+- name: restarted_nftables_service
+  ansible.builtin.service:
+    name: nftables
+    state: restarted

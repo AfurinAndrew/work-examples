@@ -1,0 +1,4 @@
+- name: enabled_dnsmasq_service
+  ansible.builtin.service:
+    name: dnsmasq
+    enabled: true

@@ -1,0 +1,23 @@
+// This file is maintained by Ansible, changes will be automatically overwritten ({{ ansible_date_time.date }})
+
+view "internals" {
+        match-clients { internals; };
+
+        zone "domain" {
+                type forward;
+                forward only;
+                forwarders { 127.0.0.1 port 5353; };
+        };
+        
+        zone "16.172.in-addr.arpa" {
+                type forward;
+                forward only;
+                forwarders { 127.0.0.1 port 5353; };
+        };
+
+        zone "17.172.in-addr.arpa" {
+                type forward;
+                forward only;
+                forwarders { 127.0.0.1 port 5353; };
+        };
+};

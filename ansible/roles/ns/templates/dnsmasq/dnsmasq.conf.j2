@@ -1,0 +1,16 @@
+listen-address=127.0.0.1
+port=5353
+
+domain-needed
+bogus-priv
+
+log-queries
+log-facility=/var/log/dnsmasq/dnsmasq_queries.log
+
+no-resolv
+no-hosts
+no-negcache
+
+server=127.0.0.1#5353
+
+addn-hosts=/etc/dnsmasq.d/addresses

@@ -1,0 +1,5 @@
+- name: Instal bind .apk
+  community.general.apk:
+    name: bind
+    update_cache: true
+  notify: enabled_named_service

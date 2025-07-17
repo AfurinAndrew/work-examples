@@ -1,0 +1,25 @@
+- name: Include task for .deb
+  include_tasks: "deb.yml"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Include task for .rpm
+  include_tasks: "rpm.yml"
+  when: ansible_distribution == 'Fedora'
+
+- name: Include task for .apk
+  include_tasks: "apk.yml"
+  when: ansible_distribution == 'Alpine'
+
+- name: nftables - enabled systemd
+  ansible.builtin.systemd:
+    name: nftables
+    enabled: true
+  notify: restarted_nftables_systemd
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: nftables - enabled service
+  ansible.builtin.service:
+    name: nftables
+    enabled: yes
+  notify: restarted_nftables_service
+  when: ansible_distribution == 'Alpine'

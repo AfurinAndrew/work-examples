@@ -1,0 +1,52 @@
+- name: Ensure a locale exists Debian/Ubuntu
+  community.general.locale_gen:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - en_US.UTF-8
+    - ru_RU.UTF-8
+  tags: locales
+
+- name: Copy certificate authority to trusted ca path
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/local/share/ca-certificates/
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - /path/to/ca_1
+    - /path/to/ca_2
+
+- name: Update CA certificates Debian/Ubuntu
+  ansible.builtin.command: update-ca-certificates
+
+- name: Update apt cache (apt update)
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  tags: packages_main
+
+- name: Install the main packages .deb
+  ansible.builtin.apt:
+    name:
+      - sudo
+      - nano
+      - curl
+      - dnsutils
+      - git
+      - htop
+      - bash-completion
+      - zstd
+      - zip
+      - unzip
+      - pigz
+      - wget
+      - gnupg
+      - rsync
+      - cloud-utils
+      - unattended-upgrades
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  tags: packages_main

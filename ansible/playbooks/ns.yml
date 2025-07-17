@@ -1,0 +1,17 @@
+- hosts: ns
+  user: root
+  vars_files:
+    - group_vars/users.yml
+  roles:
+    - role: os_common
+      tags: os_common
+    - role: os_add_user
+      tags: os_add_user
+    - role: os_nftables
+      tags: os_nftables
+    - role: bind
+      tags: bind
+    - role: dnsmasq
+      tags: dnsmasq
+    - role: ns
+      tags: ns

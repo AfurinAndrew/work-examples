@@ -1,0 +1,16 @@
+root_ssh_authorized_keys:
+  - owner: user@pc
+    key: ssh-ed25519 AAAAC3N****Q8 user@pc
+  - owner: user@macbook
+    key: ssh-ed25519 AAAAC3N****5b user@macbook
+
+users:
+  - name: user
+    comment: "User User"
+    uid: 1100
+    shadow: "User:$6$jTP0****Z0:20600:1:90:14:14::"
+    authorized_keys:
+      - owner: user@pc
+        key: ssh-ed25519 AAAAC3N****Q8 user@pc
+      - owner: user@macbook
+        key: ssh-ed25519 AAAAC3N****5b user@macbook

@@ -1,0 +1,4 @@
+- name: enabled_named_service
+  ansible.builtin.service:
+    name: named
+    enabled: true

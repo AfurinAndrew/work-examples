@@ -1,0 +1,16 @@
+- name: Set a locale en_US.UTF-8 Fedora/RHEL
+  ansible.builtin.command: localectl set-locale LANG=en_US.UTF-8
+
+- name: Copy certificate authority to trusted ca path
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/share/pki/ca-trust-source/anchors/
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - /path/to/ca_1
+    - /path/to/ca_2
+
+- name: Update CA certificates Fedora/RHEL
+  ansible.builtin.command: update-ca-trust

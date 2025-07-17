@@ -1,0 +1,45 @@
+- name: Install the main packages .apk
+  community.general.apk:
+    name: 
+      - tzdata
+      - nano
+      - nano-syntax
+      - sudo
+      - nftables
+      - openssl
+      - curl
+      - ca-certificates
+    update_cache: true
+
+- name: Set timezone to Europe/Moscow
+  community.general.timezone:
+    name: Europe/Moscow
+
+- name: Generate the template for nanorc
+  ansible.builtin.template:
+    src: nanorc.j2 
+    dest: /etc/nanorc
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Generate the .profile for root
+  ansible.builtin.template:
+    src: /path/to/playbooks/group_templates/ash_profile.j2
+    dest: /root/.profile
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Render template for config - /etc/skel/.profile
+  ansible.builtin.template:
+    src:  /path/to/playbooks/group_templates/ash_profile.j2
+    dest: /etc/skel/.profile
+
+- name: sudoers - add setings 
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^# %wheel ALL=(ALL:ALL) ALL", line: "%wheel ALL=(ALL:ALL) ALL" }

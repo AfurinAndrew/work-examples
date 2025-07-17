@@ -1,0 +1,3 @@
+- name: Include task for .apk
+  include_tasks: "apk.yml"
+  when: ansible_distribution == 'Alpine'

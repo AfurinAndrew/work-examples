@@ -1,0 +1,119 @@
+- name: Set timezone to Europe/Moscow
+  community.general.timezone:
+    name: Europe/Moscow
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: Hostname set correctly
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+
+- name: Render template for config - /etc/hosts
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+
+- name: Disable IPv6 with sysctl
+  ansible.posix.sysctl:
+    name: "{{ item }}"
+    value: 1
+    state: present
+    reload: true
+  with_items:
+    - net.ipv6.conf.all.disable_ipv6
+    - net.ipv6.conf.default.disable_ipv6
+
+- name: useradd - add setings 
+  ansible.builtin.lineinfile:
+    path: /etc/default/useradd
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^SHELL=/bin/sh", line: SHELL=/bin/bash }
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: Generate an OpenSSH keypair (ed25519)
+  community.crypto.openssh_keypair:
+    type: ed25519
+    path: ~/.ssh/id_ed25519
+    comment: "{{ ansible_user }}@{{ hostname }}"
+  tags: ssh_keygen, ssh
+
+- name: sshd_config - add setings 
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^#AuthorizedKeysFile", line: AuthorizedKeysFile     .ssh/authorized_keys }
+    - { regexp: "^#PermitRootLogin", line: PermitRootLogin no }
+    - { regexp: "^#PubkeyAuthentication", line: PubkeyAuthentication yes }
+    - { regexp: "^#LoginGraceTime", line: LoginGraceTime 15s }
+    - { regexp: "^#PasswordAuthentication", line: PasswordAuthentication no }
+    - { regexp: "^#PermitEmptyPasswords", line: PermitEmptyPasswords no }
+
+- name: Create a symbolic link - /usr/bin/python3 /usr/bin/python
+  ansible.builtin.file:
+    src: /usr/bin/python3
+    dest: /usr/bin/python
+    state: link
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: login.defs - add setings 
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: "^PASS_MAX_DAYS", line: PASS_MAX_DAYS   90 }
+    - { regexp: "^PASS_MIN_DAYS", line: PASS_MIN_DAYS   0 }
+    - { regexp: "^PASS_WARN_AGE", line: PASS_WARN_AGE   7 }
+    - { regexp: "^LOGIN_RETRIES", line: LOGIN_RETRIES   6 }
+    - { regexp: "^LOGIN_TIMEOUT", line: LOGIN_TIMEOUT   1800 }
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: Create a directory - /etc/skel/.ssh
+  ansible.builtin.file:
+    path: /etc/skel/.ssh
+    state: directory
+    mode: 0700
+
+- name: Touch - /etc/skel/.ssh/ - authorized_keys and config
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: touch
+    mode: 0600
+  with_items:
+    - "/etc/skel/.ssh/authorized_keys"
+    - "/etc/skel/.ssh/config"
+
+- name: Render template for config - /etc/skel/.ssh/config
+  ansible.builtin.template:
+    src: ssh_config.j2
+    dest: /etc/skel/.ssh/config
+    mode: 0700
+
+- name: Render template for config - /etc/skel/.bashrc
+  ansible.builtin.template:
+    src:  group_templates/bashrc.j2
+    dest: /etc/skel/.bashrc
+  tags: bashrc
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: Render template for config - /root/.bashrc
+  ansible.builtin.template:
+    src: group_templates/bashrc.j2
+    dest: /root/.bashrc
+  tags: bashrc
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: Include task for .deb
+  include_tasks: "deb.yml"
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Include task for .rpm
+  include_tasks: "rpm.yml"
+  when: ansible_distribution == 'Fedora'
+
+- name: Include task for .apk
+  include_tasks: "apk.yml"
+  when: ansible_distribution == 'Alpine'

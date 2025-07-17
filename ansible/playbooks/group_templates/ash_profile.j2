@@ -1,0 +1,40 @@
+# This file is maintained by Ansible, changes will be automatically overwritten ({{ ansible_date_time.date }})
+# .profile or .ashrc (Ash configuration file)
+
+# Source global definitions (if available)
+if [ -f /etc/profile ]; then
+    . /etc/profile
+fi
+
+# User-specific environment
+if ! echo "$PATH" | grep -q "$HOME/.local/bin:$HOME/bin:"; then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+
+# User-specific aliases and functions
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias ls='ls --color=always -F'
+alias df='df -T'
+alias jobs='jobs -l'
+alias nano='nano -c'
+
+# Load additional user-defined scripts from ~/.ashrc.d (if they exist)
+if [ -d ~/.ashrc.d ]; then
+    for rc in ~/.ashrc.d/*; do
+        if [ -f "$rc" ]; then
+            . "$rc"
+        fi
+    done
+fi
+
+# Custom prompt (PS1) setup
+if [ "$LOGNAME" = root ] || [ "$(id -u)" -eq 0 ]; then
+        PS1='\[\e[0;1;38;5;124m\]\u\[\e[0m\]@\[\e[0;38;5;226m\]\h \[\e[0m\][\[\e[0;34m\]\w\[\e[0m\]]\[\e[0m\]$\[\e[0m\]: \[\e[0m\]'
+else
+        PS1='\[\e[0;92m\]\u\[\e[0m\]@\[\e[0;38;5;226m\]\h \[\e[0m\][\[\e[0;34m\]\w\[\e[0m\]]\[\e[0m\]$\[\e[0m\]: \[\e[0m\]'
+fi
+
+export PS1

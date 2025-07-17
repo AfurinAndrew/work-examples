@@ -1,0 +1,35 @@
+// This file is maintained by Ansible, changes will be automatically overwritten ({{ ansible_date_time.date }})
+
+view "any" {
+    match-clients { any; };
+
+	zone "." {
+		type hint;
+	{% if ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'%}
+		file "/usr/share/dns/root.hints";
+	{% endif %}
+	{% if ansible_distribution == 'Alpine'%}
+		file "/usr/share/dns-root-hints/named.root";
+	{% endif %}
+	};
+
+	zone "localhost" {
+		type master;
+		file "/etc/bind/zones/db.local";
+	};
+
+	zone "127.in-addr.arpa" {
+		type master;
+		file "/etc/bind/zones/db.127";
+	};
+
+	zone "0.in-addr.arpa" {
+		type master;
+		file "/etc/bind/zones/db.0";
+	};
+
+	zone "255.in-addr.arpa" {
+		type master;
+		file "/etc/bind/zones/db.255";
+	};
+};

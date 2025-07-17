@@ -1,0 +1,55 @@
+// This file is maintained by Ansible, changes will be automatically overwritten ({{ ansible_date_time.date }})
+
+options {
+
+	forwarders {
+		208.67.222.222;
+		208.67.220.220;
+		9.9.9.9;
+		149.112.112.112;
+	};
+
+	forward only;
+
+	listen-on {
+		127.0.0.1;
+		{{ ansible_host }};
+	};
+
+	listen-on-v6 {none;};
+
+	directory "/var/cache/bind";
+
+	dnssec-validation auto;
+
+    validate-except
+    {
+            "domain";
+            "16.172.in-addr.arpa";
+    };
+
+	allow-transfer { none; };
+	allow-query { internals; };
+	allow-recursion { internals; };
+};
+
+logging {
+    channel queries_log {
+        file "/var/log/bind/bind_queries.log";
+        severity info;
+        print-time yes;
+    };
+
+    channel default_log {
+        file "/var/log/bind/bind.log";
+        severity info;
+        print-time yes;
+    };
+
+    category default { default_log; };
+    category queries { queries_log; };
+};
+
+statistics-channels {
+        inet 127.0.0.1 port 8053;
+};

@@ -1,0 +1,43 @@
+# This file is maintained by Ansible, changes will be automatically overwritten ({{ ansible_date_time.date }})
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+fi
+export PATH
+
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
+
+# User specific aliases and functions
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias ls='ls --color=always -F'
+alias ip='ip -c'
+alias df='df -T'
+alias grep='grep --color=auto'
+alias jobs='jobs -l'
+alias nano='nano -c'
+
+if [ -d ~/.bashrc.d ]; then
+	for rc in ~/.bashrc.d/*; do
+		if [ -f "$rc" ]; then
+			. "$rc"
+		fi
+	done
+fi
+unset rc
+
+if [ "$LOGNAME" = root ] || [ "`id -u`" -eq 0 ] ; then
+	PS1='\[\e[0;1;38;5;124m\]\u\[\e[0m\]@\[\e[0;38;5;226m\]\h \[\e[0m\][\[\e[0;34m\]\w\[\e[0m\]]\[\e[0m\]$\[\e[0m\]: \[\e[0m\]'
+else
+	PS1='\[\e[0;92m\]\u\[\e[0m\]@\[\e[0;38;5;226m\]\h \[\e[0m\][\[\e[0;34m\]\w\[\e[0m\]]\[\e[0m\]$\[\e[0m\]: \[\e[0m\]'
+fi

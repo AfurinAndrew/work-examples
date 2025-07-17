@@ -1,0 +1,5 @@
+- name: Instal dnsmasq .apk
+  community.general.apk:
+    name: dnsmasq
+    update_cache: true
+  notify: enabled_dnsmasq_service

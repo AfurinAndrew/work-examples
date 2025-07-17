@@ -1,0 +1,9 @@
+- name: Install nftables .rpm
+  ansible.builtin.dnf:
+    name:
+      - nftables
+
+- name: Render template for config - /etc/sysconfig/nftables.conf
+  ansible.builtin.template:
+    src: default.nftables.conf.j2
+    dest: /etc/sysconfig/nftables.conf

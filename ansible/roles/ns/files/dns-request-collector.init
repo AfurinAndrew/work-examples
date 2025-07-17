@@ -1,0 +1,31 @@
+#!/sbin/openrc-run
+
+name=dns_request_collector
+program_path=/root/bin/dns_request_collector/dns_request_collector.py
+pidfile=/run/$name.pid
+
+depend() {
+        need net
+}
+
+if [ ! -f "$program_path" ]; then
+    eerror "Error: $program_path not found!"
+    exit 1
+fi
+
+start() {
+    ebegin "Starting $name"
+    start-stop-daemon --start --background --make-pidfile --pidfile $pidfile --exec $program_path
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping $name"
+    start-stop-daemon --stop --quiet --pidfile $pidfile
+    eend $?
+}
+
+restart() {
+    stop
+    start
+}

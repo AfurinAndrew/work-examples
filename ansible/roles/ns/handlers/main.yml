@@ -1,0 +1,24 @@
+- name: restarted_dns_request_collector_service
+  ansible.builtin.service:
+    name: dns-request-collector
+    state: restarted
+
+- name: restarted_named_service
+  ansible.builtin.service:
+    name: named
+    state: restarted
+
+- name: restarted_dnsmasq_service
+  ansible.builtin.service:
+    name: dnsmasq
+    state: restarted
+
+- name: restarted_nftables_systemd
+  ansible.builtin.systemd:
+    name: nftables
+    state: restarted
+
+- name: restarted_nftables_service
+  ansible.builtin.service:
+    name: nftables
+    state: restarted

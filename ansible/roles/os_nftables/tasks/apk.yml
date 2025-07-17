@@ -1,0 +1,10 @@
+- name: Install nftables .apk
+  community.general.apk:
+    name: 
+      - nftables
+    update_cache: true
+
+- name: Render template for config - /etc/nftables.nft
+  ansible.builtin.template:
+    src: default.nftables.conf.j2
+    dest: /etc/nftables.nft

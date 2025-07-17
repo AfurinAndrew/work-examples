@@ -1,0 +1,101 @@
+- name: Add a user with sudo privileges (Alpine)
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    shell: /bin/sh
+    uid: "{{ item.uid }}"
+    groups: adm, wheel
+    append: true
+  with_items: 
+    - "{{ users }}"
+  when: ansible_distribution == 'Alpine'
+
+- name: Add a user with sudo privileges (Debian)
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    shell: /bin/bash
+    uid: "{{ item.uid }}"
+    groups: sudo
+    append: true
+  with_items: 
+    - "{{ users }}"
+  become: true
+  become_user: root
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Add a user with sudo privileges (RHEL like)
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment }}"
+    shell: /bin/bash
+    uid: "{{ item.uid }}"
+    groups: adm, wheel
+    append: true
+  with_items: 
+    - "{{ users }}"
+  become: true
+  become_user: root
+  when: ansible_distribution == 'Fedora'
+
+- name: Add shadow
+  ansible.builtin.lineinfile:
+    path: /etc/shadow
+    regexp: "^{{ item.name }}:"
+    line: "{{ item.shadow }}"
+  with_items:
+    - "{{ users }}"
+  become: true
+  become_user: root
+
+- name: Create directory - /home/$USER/.ssh
+  ansible.builtin.file:
+    path: "/home/{{ item.name }}/.ssh"
+    state: directory
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: '0700'
+  with_items:
+    - "{{ users }}"
+  tags: sshkey
+  become: true
+  become_user: root
+
+- name: Render template for config - authorized_keys
+  ansible.builtin.template:
+    src: ~/ansible/playbooks/group_templates/authorized_keys.j2
+    dest: "/home/{{ item.name }}/.ssh/authorized_keys"
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: '0700'
+  vars:
+    name: "{{ item.name }}"
+  with_items:
+    - "{{ users }}"
+  tags: sshkey
+  become: true
+  become_user: root
+
+- name: Copy .bashrc
+  ansible.builtin.template:
+    src: ~/ansible/playbooks/group_templates/bashrc.j2
+    dest: /home/{{ item.name }}/.bashrc
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: 0644
+  with_items:
+    - "{{ users }}"
+  become: true
+  become_user: root
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu' or ansible_distribution == 'Fedora'
+
+- name: Copy .profile
+  ansible.builtin.template:
+    src: ~/ansible/playbooks/group_templates/ash_profile.j2
+    dest: /home/{{ item.name }}/.profile
+    owner: "{{ item.name }}"
+    group: "{{ item.name }}"
+    mode: 0644
+  with_items:
+    - "{{ users }}"
+  when: ansible_distribution == 'Alpine'

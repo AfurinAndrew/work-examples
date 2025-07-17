@@ -1,0 +1,30 @@
+#jinja2:lstrip_blocks: True
+# This file is maintained by Ansible, changes will be automatically overwritten ({{ ansible_date_time.date }})
+
+{# for users #}
+{% if users is defined %}
+    {% for user in users %}
+        {% if user.name == name %}
+            {% for ssh_key in user.authorized_keys %}
+# {{ssh_key.owner}} #
+{{ssh_key["key"]}}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{# for root #}
+{% if root_ssh_authorized_keys is defined and name == "root" %}
+{% for ssh_key in root_ssh_authorized_keys %}
+# {{ssh_key.owner}} #
+{{ssh_key["key"]}}
+{% endfor %}
+{% endif %}
+{# for root 
+{% if extended_ssh_keys is defined %}
+## extended_ssh_keys ##
+{% for ssh_key in extended_ssh_keys %}
+# {{ssh_key.owner}} #
+{{ssh_key["key"]}}
+{% endfor %}
+{% endif %}
+#}
